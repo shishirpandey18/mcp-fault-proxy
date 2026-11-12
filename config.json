@@ -1,0 +1,31 @@
+{
+  "seed": 42,
+  "rules": [
+    {
+        "tool": "calculator",  
+        "fault": "latency",      
+        "probability": 0.5, 
+        "delay_ms": 1400
+    },
+    {
+        "tool": "calculator",  
+        "fault": "error", 
+        "probability": 0.4, 
+        "code": -32603, 
+        "message": "Calculator service crashed"
+    },
+    {
+        "tool": "get_revenue", 
+        "fault": "error", 
+        "probability": 0.2, 
+        "code": -32001, 
+        "message": "Request timed out"
+    },
+    {
+        "tool": "get_revenue", 
+        "fault": "wrong_result", 
+        "probability": 0.5, 
+        "factor": 1.1
+    }
+  ]
+}

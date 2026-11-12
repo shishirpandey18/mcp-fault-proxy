@@ -15,7 +15,7 @@ else:
     #start the proxy and tell it how to start the server (after "--")
     params=StdioServerParameters(
         command=sys.executable,
-        args=["proxy.py","--",sys.executable,"toy_server.py"],
+        args=["proxy.py", "--config", "config.json", "--", sys.executable, "toy_server.py"],
     )
 
 # The tool calls "agent" will make, in this order.
