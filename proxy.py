@@ -3,9 +3,12 @@ import json
 import subprocess
 import sys
 import threading
+import time
 
 write_lock = threading.Lock()  # stops two threads writing at the same time
 
+LATENCY_TOOL = "calculator"
+LATENCY_MS = 1400
 
 def send(stream, msg):
     with write_lock:
@@ -22,6 +25,13 @@ def client_to_server(server_in):
     for line in sys.stdin:
         msg = json.loads(line)
         log("client -> server", msg)
+        
+        if msg.get("method")=="tools/call":
+            tool = msg["params"]["name"]
+            if tool == LATENCY_TOOL:
+                print(f"[proxy] fault latency: delaying {tool} by {LATENCY_MS} ms", file=sys.stderr)
+                time.sleep(LATENCY_MS/1000)
+                
         send(server_in, msg)
     server_in.close()  
 
