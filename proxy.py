@@ -10,6 +10,10 @@ write_lock = threading.Lock()  # stops two threads writing at the same time
 LATENCY_TOOL = "calculator"
 LATENCY_MS = 1400
 
+ERROR_TOOL = "get_revenue"
+ERROR_CODE = -32603
+ERROR_MESSAGE = "injected server error"
+
 def send(stream, msg):
     with write_lock:
         stream.write(json.dumps(msg) + "\n")
@@ -31,7 +35,16 @@ def client_to_server(server_in):
             if tool == LATENCY_TOOL:
                 print(f"[proxy] fault latency: delaying {tool} by {LATENCY_MS} ms", file=sys.stderr)
                 time.sleep(LATENCY_MS/1000)
-                
+            elif tool == ERROR_TOOL:
+                print(f"[proxy] fault error: answering {tool} with an error", file=sys.stderr)
+                reply = {
+                    "jsonrpc" : "2.0",
+                    "id" : msg['id'],
+                    "error": {"code": ERROR_CODE, "message": ERROR_MESSAGE},
+                }
+                log("proxy -> client", reply )
+                send(sys.stdout, reply)
+                continue
         send(server_in, msg)
     server_in.close()  
 
