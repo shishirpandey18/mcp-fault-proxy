@@ -7,7 +7,16 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 
-params = StdioServerParameters(command=sys.executable, args=["toy_server.py"])
+#params = StdioServerParameters(command=sys.executable, args=["toy_server.py"])
+
+if "--no-proxy" in sys.argv:
+    params = StdioServerParameters(command=sys.executable, args=["toy_server.py"]) #self-start the server without going through proxy
+else:
+    #start the proxy and tell it how to start the server (after "--")
+    params=StdioServerParameters(
+        command=sys.executable,
+        args=["proxy.py","--",sys.executable,"toy_server.py"],
+    )
 
 # The tool calls "agent" will make, in this order.
 CALLS = [
