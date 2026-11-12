@@ -4,15 +4,26 @@ import subprocess
 import sys
 import threading
 import time
+import re
 
 write_lock = threading.Lock()  # stops two threads writing at the same time
 
 LATENCY_TOOL = "calculator"
 LATENCY_MS = 1400
 
-ERROR_TOOL = "get_revenue"
+ERROR_TOOL = "none"
 ERROR_CODE = -32603
 ERROR_MESSAGE = "injected server error"
+
+WRONG_TOOL = "get_revenue"
+WRONG_FACTOR = 1.1
+
+pending = {}
+
+def perturb_first_number(text, factor):
+    return re.sub(r"\d+\.\d+",
+                  lambda m: f"{float(m.group())*factor:.1f}",
+                  text, count=1)
 
 def send(stream, msg):
     with write_lock:
@@ -45,6 +56,9 @@ def client_to_server(server_in):
                 log("proxy -> client", reply )
                 send(sys.stdout, reply)
                 continue
+            elif tool == WRONG_TOOL:
+                pending[msg["id"]] = tool
+                
         send(server_in, msg)
     server_in.close()  
 
@@ -53,6 +67,20 @@ def server_to_client(server_out):
     for line in server_out:
         msg = json.loads(line)
         log("server -> client", msg)
+        
+        if msg.get("id") in pending and "result" in msg:
+            tool = pending.pop(msg["id"])
+            
+            for item in msg["result"].get("content", []):
+                if item.get("type")=="text":
+                    old= item["text"]
+                    item["text"] = perturb_first_number(old, WRONG_FACTOR)
+                    print(f"[proxy] fault wrong_result: {tool}: {old!r}->{item['text']!r}", file=sys.stderr)
+                    
+            sc=msg["result"].get("structuredContent")
+            if isinstance(sc, dict) and isinstance(sc.get("result"),str):
+                sc["result"]=perturb_first_number(sc["result"],WRONG_FACTOR)
+                
         send(sys.stdout, msg)
 
 
