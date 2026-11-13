@@ -1,5 +1,6 @@
 {
   "seed": 42,
+  "log_file": "faults.log",
   "rules": [
     {
         "tool": "calculator",  

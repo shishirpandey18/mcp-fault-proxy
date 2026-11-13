@@ -45,14 +45,30 @@ def send(stream, msg):
 def log(direction, msg):
     what = msg.get("method") or ("error" if "error" in msg else "result")
     print(f"[proxy] {direction} id={msg.get('id')} {what}", file=sys.stderr)
+    
+def record(fault_log, call_number, request_id, tool, fault, detail):
+    entry = {
+        "time": time.strftime("%H:%M:%S"),
+        "call_number": call_number,
+        "request_id": request_id,
+        "tool": tool,
+        "fault": fault,
+        "detail": detail,
+    }
+    with write_lock:
+        fault_log.write(json.dumps(entry) + "\n")
+        fault_log.flush()
+    print(f"[proxy] fault {json.dumps(entry)}", file=sys.stderr)
 
 
-def client_to_server(server_in, rules, rng):
+def client_to_server(server_in, rules, rng, fault_log):
+    call_number =0
     for line in sys.stdin:
         msg = json.loads(line)
         log("client -> server", msg)
         
         if msg.get("method")=="tools/call":
+            call_number +=1
             tool = msg["params"]["name"]
             rule = pick_fault(rules,rng,tool)
             
@@ -60,41 +76,43 @@ def client_to_server(server_in, rules, rng):
                 pass
             elif rule["fault"] == "latency":
                 ms= rule.get("delay_ms", 1400)
-                print(f"[proxy] fault latency: delaying {tool} by {ms} ms", file=sys.stderr)
+                record(fault_log, call_number, msg["id"], tool, "latency", f"delayed {ms} ms")
                 time.sleep(ms/1000)
                 
             elif rule["fault"] == "error":
-                print(f"[proxy] fault error: answering {tool} with an error", file=sys.stderr)
+                code= rule.get("code", -32603)
+                message= rule.get("message", "Injected server error")
+                record(fault_log, call_number, msg["id"], tool, "error", f"returned JSON-RPC error {code}: {message}")
                 reply = {
                     "jsonrpc" : "2.0",
                     "id" : msg['id'],
-                    "error": {"code": rule.get("code", -32603), "message": rule.get("message", "Injected server error")},
+                    "error": {"code": code, "message": message},
                 }
                 log("proxy -> client", reply )
                 send(sys.stdout, reply)
                 continue
             
             elif rule["fault"] == "wrong_result":
-                pending[msg["id"]] = rule
+                pending[msg["id"]] = (rule, call_number)
                 
         send(server_in, msg)
     server_in.close()  
 
 
-def server_to_client(server_out):
+def server_to_client(server_out, fault_log):
     for line in server_out:
         msg = json.loads(line)
         log("server -> client", msg)
         
         if msg.get("id") in pending and "result" in msg:
-            rule = pending.pop(msg["id"])
+            rule, call_number = pending.pop(msg["id"])
             factor = rule.get("factor", 1.1)
             
             for item in msg["result"].get("content", []):
                 if item.get("type")=="text":
                     old= item["text"]
                     item["text"] = perturb_first_number(old, factor)
-                    print(f"[proxy] fault wrong_result: {old!r}->{item['text']!r}", file=sys.stderr)
+                    record(fault_log, call_number, msg["id"], rule["tool"], "wrong_result", f"numbers x{factor}: {old!r} -> {item['text']!r}")
                     
             sc=msg["result"].get("structuredContent")
             if isinstance(sc, dict) and isinstance(sc.get("result"),str):
@@ -115,15 +133,17 @@ def main():
         config = json.load(f)
     rules = config["rules"]
     rng = random.Random(config.get("seed", 0))
+    fault_log = open(config.get("log_file", "faults.log"), "a")  # "a" = append
 
     server = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                               text=True, bufsize=1)
     # One thread copies server -> client, while the main code copies client -> server.
-    t = threading.Thread(target=server_to_client, args=(server.stdout,), daemon=True)
+    t = threading.Thread(target=server_to_client, args=(server.stdout, fault_log), daemon=True)
     t.start()
-    client_to_server(server.stdin, rules, rng)
+    client_to_server(server.stdin, rules, rng, fault_log)
     server.wait()
     t.join(timeout=1)
+    fault_log.close()
 
 
 if __name__ == "__main__":
