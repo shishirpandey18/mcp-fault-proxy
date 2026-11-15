@@ -1,0 +1,18 @@
+{"time": "01:18:23", "call_number": 1, "request_id": 3, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'Esewaa FY2025 revenue: EUR 546.6 million (FY2024: EUR 432.0 million).' -> 'Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).'"}
+{"time": "01:18:23", "call_number": 2, "request_id": 4, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'NepEU FY2025 revenue: EUR 95.4 million (FY2024: EUR 89.7 million).' -> 'NepEU FY2025 revenue: EUR 104.9 million (FY2024: EUR 89.7 million).'"}
+{"time": "01:18:23", "call_number": 3, "request_id": 5, "tool": "calculator", "fault": "latency", "detail": "delayed 1400 ms"}
+{"time": "01:18:24", "call_number": 4, "request_id": 6, "tool": "calculator", "fault": "latency", "detail": "delayed 1400 ms"}
+{"time": "01:18:26", "call_number": 5, "request_id": 7, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'Esewaa FY2025 revenue: EUR 546.6 million (FY2024: EUR 432.0 million).' -> 'Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).'"}
+{"time": "01:18:26", "call_number": 7, "request_id": 9, "tool": "calculator", "fault": "error", "detail": "returned JSON-RPC error -32603: Calculator service crashed"}
+{"time": "01:18:40", "call_number": 1, "request_id": 3, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'Esewaa FY2025 revenue: EUR 546.6 million (FY2024: EUR 432.0 million).' -> 'Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).'"}
+{"time": "01:18:41", "call_number": 2, "request_id": 4, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'NepEU FY2025 revenue: EUR 95.4 million (FY2024: EUR 89.7 million).' -> 'NepEU FY2025 revenue: EUR 104.9 million (FY2024: EUR 89.7 million).'"}
+{"time": "01:18:41", "call_number": 3, "request_id": 5, "tool": "calculator", "fault": "latency", "detail": "delayed 1400 ms"}
+{"time": "01:18:42", "call_number": 4, "request_id": 6, "tool": "calculator", "fault": "latency", "detail": "delayed 1400 ms"}
+{"time": "01:18:43", "call_number": 5, "request_id": 7, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'Esewaa FY2025 revenue: EUR 546.6 million (FY2024: EUR 432.0 million).' -> 'Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).'"}
+{"time": "01:18:43", "call_number": 7, "request_id": 9, "tool": "calculator", "fault": "error", "detail": "returned JSON-RPC error -32603: Calculator service crashed"}
+{"time": "09:13:41", "call_number": 1, "request_id": 3, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'Esewaa FY2025 revenue: EUR 546.6 million (FY2024: EUR 432.0 million).' -> 'Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).'"}
+{"time": "09:13:41", "call_number": 2, "request_id": 4, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'NepEU FY2025 revenue: EUR 95.4 million (FY2024: EUR 89.7 million).' -> 'NepEU FY2025 revenue: EUR 104.9 million (FY2024: EUR 89.7 million).'"}
+{"time": "09:13:41", "call_number": 3, "request_id": 5, "tool": "calculator", "fault": "latency", "detail": "delayed 1400 ms"}
+{"time": "09:13:43", "call_number": 4, "request_id": 6, "tool": "calculator", "fault": "latency", "detail": "delayed 1400 ms"}
+{"time": "09:13:44", "call_number": 5, "request_id": 7, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'Esewaa FY2025 revenue: EUR 546.6 million (FY2024: EUR 432.0 million).' -> 'Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).'"}
+{"time": "09:13:44", "call_number": 7, "request_id": 9, "tool": "calculator", "fault": "error", "detail": "returned JSON-RPC error -32603: Calculator service crashed"}

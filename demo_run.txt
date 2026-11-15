@@ -1,0 +1,36 @@
+[proxy] client -> server id=1 initialize
+[proxy] server -> client id=1 result
+[proxy] client -> server id=None notifications/initialized
+[proxy] client -> server id=2 tools/list
+[proxy] server -> client id=2 result
+tools: ['calculator', 'get_revenue']
+[proxy] client -> server id=3 tools/call
+[proxy] server -> client id=3 result
+[proxy] fault {"time": "09:13:41", "call_number": 1, "request_id": 3, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'Esewaa FY2025 revenue: EUR 546.6 million (FY2024: EUR 432.0 million).' -> 'Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).'"}
+1. get_revenue({'company': 'esewaa'}) -> [ok, 30 ms] Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).
+[proxy] client -> server id=4 tools/call
+[proxy] server -> client id=4 result
+[proxy] fault {"time": "09:13:41", "call_number": 2, "request_id": 4, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'NepEU FY2025 revenue: EUR 95.4 million (FY2024: EUR 89.7 million).' -> 'NepEU FY2025 revenue: EUR 104.9 million (FY2024: EUR 89.7 million).'"}
+2. get_revenue({'company': 'nepeu'}) -> [ok, 1 ms] NepEU FY2025 revenue: EUR 104.9 million (FY2024: EUR 89.7 million).
+[proxy] client -> server id=5 tools/call
+[proxy] fault {"time": "09:13:41", "call_number": 3, "request_id": 5, "tool": "calculator", "fault": "latency", "detail": "delayed 1400 ms"}
+[proxy] server -> client id=5 result
+3. calculator({'expression': '(546.6-432.0)/432.0'}) -> [ok, 1412 ms] 0.265278
+[proxy] client -> server id=6 tools/call
+[proxy] fault {"time": "09:13:43", "call_number": 4, "request_id": 6, "tool": "calculator", "fault": "latency", "detail": "delayed 1400 ms"}
+[proxy] server -> client id=6 result
+4. calculator({'expression': '(95.4-89.7)/89.7'}) -> [ok, 1409 ms] 0.063545
+[proxy] client -> server id=7 tools/call
+[proxy] server -> client id=7 result
+[proxy] fault {"time": "09:13:44", "call_number": 5, "request_id": 7, "tool": "get_revenue", "fault": "wrong_result", "detail": "numbers x1.1: 'Esewaa FY2025 revenue: EUR 546.6 million (FY2024: EUR 432.0 million).' -> 'Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).'"}
+5. get_revenue({'company': 'esewaa'}) -> [ok, 2 ms] Esewaa FY2025 revenue: EUR 601.3 million (FY2024: EUR 432.0 million).
+[proxy] client -> server id=8 tools/call
+[proxy] server -> client id=8 result
+6. calculator({'expression': '2*21'}) -> [ok, 2 ms] 42
+[proxy] client -> server id=9 tools/call
+[proxy] fault {"time": "09:13:44", "call_number": 7, "request_id": 9, "tool": "calculator", "fault": "error", "detail": "returned JSON-RPC error -32603: Calculator service crashed"}
+[proxy] proxy -> client id=9 error
+7. calculator({'expression': '100/8'}) -> [ERROR(rpc), 0 ms] Calculator service crashed
+[proxy] client -> server id=10 tools/call
+[proxy] server -> client id=10 result
+8. get_revenue({'company': 'nepeu'}) -> [ok, 2 ms] NepEU FY2025 revenue: EUR 95.4 million (FY2024: EUR 89.7 million).
